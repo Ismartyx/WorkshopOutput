@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>حواله و خروجی کارگاه</title>
+  <script src="cordova.js"></script>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111827;
+      --panel-soft: #1e293b;
+      --line: #243041;
+      --line-light: #334155;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --purple: #a855f7;
+      --fz: 15px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: var(--fz);
+      line-height: 1.5;
+      padding-bottom: 70px;
+      user-select: none;
+    }
+
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .app-title {
+      font-weight: 800;
+      font-size: 1.02em;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 5px;
+    }
+
+    .tab-btn {
+      background: var(--panel-soft);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      padding: 7px 11px;
+      border-radius: 10px;
+      font-size: 0.85em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.16);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .panel-title {
+      font-weight: 700;
+      font-size: 1em;
+      margin-bottom: 12px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.86em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--line-light);
+      border-radius: 11px;
+      padding: 10px 12px;
+      font-size: 0.95em;
+      font-family: inherit;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+    }
+
+    /* Quick Frequent Chips */
+    .chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+
+    .chip {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--line-light);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 0.86em;
+      cursor: pointer;
+      transition: 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .chip.selected {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .chip-empty {
+      color: var(--warn);
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.08);
+      font-size: 0.84em;
+    }
+
+    /* Custom Dropdown (custom-dd) like FinanceApp */
+    .custom-dd {
+      position: relative;
+      width: 100%;
+    }
+
+    .custom-dd-trigger {
+      width: 100%;
+      border-radius: 11px;
+      border: 1px solid var(--line-light);
+      background: var(--bg);
+      color: var(--text);
+      padding: 9px 12px;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .custom-dd.open .custom-dd-trigger {
+      border-color: var(--accent);
+    }
+
+    .custom-dd-arrow {
+      font-size: 0.75em;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+
+    .custom-dd.open .custom-dd-arrow {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
+    .custom-dd-menu {
+      position: absolute;
+      top: calc(100% + 5px);
+      right: 0;
+      left: 0;
+      background: var(--panel);
+      border: 1px solid var(--line-light);
+      border-radius: 12px;
+      padding: 6px;
+      z-index: 95;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.55);
+      max-height: 230px;
+      overflow-y: auto;
+    }
+
+    .custom-dd.open .custom-dd-menu {
+      display: block;
+    }
+
+    .dd-search {
+      padding: 7px 10px;
+      margin-bottom: 5px;
+      border-radius: 8px;
+      font-size: 0.86em;
+      background: var(--bg);
+      border: 1px solid var(--line);
+    }
+
+    .custom-dd-item {
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text);
+    }
+
+    .custom-dd-item:active,
+    .custom-dd-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .custom-dd-item.selected {
+      background: rgba(56, 189, 248, 0.18);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .date-helpers {
+      display: flex;
+      gap: 5px;
+      margin-top: 6px;
+    }
+
+    .mini-btn {
+      background: var(--panel-soft);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 5px 9px;
+      font-size: 0.8em;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+    }
+
+    .mini-btn:active {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: #08101d;
+      border: none;
+      border-radius: 11px;
+      padding: 12px;
+      font-size: 1em;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .btn-primary:active {
+      opacity: 0.85;
+    }
+
+    /* Filter & Stats Box */
+    .stats-banner {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(168, 85, 247, 0.12));
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    .stat-box {
+      background: rgba(11, 18, 32, 0.7);
+      border-radius: 9px;
+      padding: 8px 4px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat-val {
+      font-size: 1.2em;
+      font-weight: 800;
+      color: #fff;
+      display: block;
+    }
+
+    .stat-val.highlight { color: var(--accent); }
+    .stat-val.warn { color: var(--warn); }
+
+    .stat-lbl {
+      font-size: 0.74em;
+      color: var(--muted);
+    }
+
+    /* Output Items List */
+    .item-card {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-right: 4px solid var(--warn);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .item-card.done-all {
+      border-right-color: var(--ok);
+      background: rgba(34, 197, 94, 0.04);
+    }
+
+    .item-card.done-partial {
+      border-right-color: var(--accent);
+    }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .item-title {
+      font-weight: 800;
+      font-size: 1.02em;
+      color: #fff;
+    }
+
+    .item-customer {
+      display: inline-block;
+      background: rgba(168, 85, 247, 0.16);
+      color: #d8b4fe;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      padding: 2px 8px;
+      border-radius: 7px;
+      font-size: 0.82em;
+      margin-right: 6px;
+    }
+
+    .item-qty {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.95em;
+      white-space: nowrap;
+    }
+
+    .item-meta {
+      font-size: 0.82em;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .checks-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .check-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 0.88em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .check-btn.checked-warehouse {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .check-btn.checked-invoice {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: var(--ok);
+      color: var(--ok);
+    }
+
+    .check-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 2px solid currentColor;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1em;
+      padding: 2px 5px;
+    }
+
+    .manage-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .manage-pill {
+      background: var(--bg);
+      border: 1px solid var(--line-light);
+      border-radius: 9px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9em;
+    }
+
+    .manage-pill button {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 1em;
+      padding: 0;
+    }
+
+    .hidden { display: none !important; }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px 10px;
+      font-size: 0.9em;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #fff;
+      border: 1px solid var(--accent);
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 0.88em;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+
+    #toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="app-title">📦 خروجی کارگاه</div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('main')">ثبت و لیست</button>
+      <button class="tab-btn" onclick="switchTab('defs')">مشتری / کالا</button>
+      <button class="tab-btn" onclick="switchTab('backup')">بکاپ</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- TAB 1: MAIN -->
+    <div id="tab-main">
+
+      <!-- Entry Panel -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>➕ ثبت خروجی جدید</span>
+        </div>
+
+        <!-- Customer Selection (Top Frequent + Custom Dropdown) -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>👤 مشتری (پرمصرف‌ها):</span>
+          </div>
+          <div id="customerChips" class="chips-wrap"></div>
+          <div class="custom-dd" id="dd-select-customer">
+            <div class="custom-dd-trigger" onclick="toggleDD('dd-select-customer')">
+              <span id="dd-customer-label">انتخاب از کل لیست مشتریان...</span>
+              <span class="custom-dd-arrow">▼</span>
+            </div>
+            <div class="custom-dd-menu">
+              <input type="text" class="dd-search" placeholder="جستجوی مشتری..." oninput="filterDDItems('dd-customer-items', this.value)" onclick="event.stopPropagation()" />
+              <div id="dd-customer-items"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Selection (Top Frequent + Custom Dropdown) -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>⚙️ کالا / قطعه (پرمصرف‌ها):</span>
+          </div>
+          <div id="productChips" class="chips-wrap"></div>
+          <div class="custom-dd" id="dd-select-product">
+            <div class="custom-dd-trigger" onclick="toggleDD('dd-select-product')">
+              <span id="dd-product-label">انتخاب از کل لیست کالاها...</span>
+              <span class="custom-dd-arrow">▼</span>
+            </div>
+            <div class="custom-dd-menu">
+              <input type="text" class="dd-search" placeholder="جستجوی کالا..." oninput="filterDDItems('dd-product-items', this.value)" onclick="event.stopPropagation()" />
+              <div id="dd-product-items"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quantity & Date -->
+        <div class="row-2">
+          <div class="form-group">
+            <div class="form-label"><span>🔢 تعداد:</span></div>
+            <input type="number" id="qtyInput" placeholder="مثلاً 50" inputmode="numeric" />
+            <div class="date-helpers">
+              <span class="mini-btn" onclick="addQty(10)">+۱۰</span>
+              <span class="mini-btn" onclick="addQty(50)">+۵۰</span>
+              <span class="mini-btn" onclick="addQty(100)">+۱۰۰</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label"><span>📅 تاریخ (شمسی):</span></div>
+            <input type="text" id="dateInput" placeholder="1405/07/06" style="text-align:center; direction:ltr;" />
+            <div class="date-helpers">
+              <span class="mini-btn" onclick="setToday()">امروز</span>
+              <span class="mini-btn" onclick="shiftDate(-1)">دیروز</span>
+              <span class="mini-btn" onclick="shiftDate(1)">+۱</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input type="text" id="noteInput" placeholder="توضیحات اختیاری (شماره سفارش، پارت و...)" />
+        </div>
+
+        <button class="btn-primary" onclick="saveRecord()">✅ ثبت در لیست خروجی‌ها</button>
+      </div>
+
+      <!-- Filter & Archive Search Panel -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>🔍 فیلتر، آرشیو و جمع تعداد</span>
+          <button class="mini-btn" style="flex:0; white-space:nowrap;" onclick="resetFilters()">نمایش پیش‌فرض</button>
+        </div>
+
+        <!-- Row 1: Customer & Product Custom Dropdowns -->
+        <div class="row-2" style="margin-bottom:10px;">
+          <div>
+            <div class="form-label">فیلتر مشتری:</div>
+            <div class="custom-dd" id="dd-filter-customer">
+              <div class="custom-dd-trigger" onclick="toggleDD('dd-filter-customer')">
+                <span id="filterCustomerText">همه مشتریان</span>
+                <span class="custom-dd-arrow">▼</span>
+              </div>
+              <div class="custom-dd-menu" id="filterCustomerMenu"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="form-label">فیلتر کالا:</div>
+            <div class="custom-dd" id="dd-filter-product">
+              <div class="custom-dd-trigger" onclick="toggleDD('dd-filter-product')">
+                <span id="filterProductText">همه کالاها</span>
+                <span class="custom-dd-arrow">▼</span>
+              </div>
+              <div class="custom-dd-menu" id="filterProductMenu"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Month/Archive Filter & Tick Status Filter -->
+        <div class="row-2" style="margin-bottom:10px;">
+          <div>
+            <div class="form-label">📅 ماه / آرشیو زمانی:</div>
+            <div class="custom-dd" id="dd-filter-month">
+              <div class="custom-dd-trigger" onclick="toggleDD('dd-filter-month')">
+                <span id="filterMonthText">همه زمان‌ها</span>
+                <span class="custom-dd-arrow">▼</span>
+              </div>
+              <div class="custom-dd-menu" id="filterMonthMenu"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="form-label">وضعیت تیک‌ها:</div>
+            <div class="custom-dd" id="dd-filter-status">
+              <div class="custom-dd-trigger" onclick="toggleDD('dd-filter-status')">
+                <span id="filterStatusText">⏳ تکمیل نشده‌ها</span>
+                <span class="custom-dd-arrow">▼</span>
+              </div>
+              <div class="custom-dd-menu" id="filterStatusMenu"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Box for Notes / Specific Dates -->
+        <div class="form-group" style="margin-bottom:12px;">
+          <input type="text" id="searchQuery" placeholder="🔎 جستجو در تاریخ دقیق (مثلاً 1405/01) یا توضیحات..." oninput="renderRecords()" />
+        </div>
+
+        <!-- Dynamic Summary Banner -->
+        <div class="stats-banner">
+          <div class="stat-box">
+            <span class="stat-val highlight" id="sumTotalQty">0</span>
+            <span class="stat-lbl">جمع تعداد این فیلتر</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-val warn" id="sumNoWarehouse">0</span>
+            <span class="stat-lbl">تعداد رسید انبار نشده</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-val warn" id="sumNoInvoice">0</span>
+            <span class="stat-lbl">تعداد فاکتور نشده</span>
+          </div>
+        </div>
+
+        <!-- Records List -->
+        <div id="recordsList"></div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: CUSTOMERS & PRODUCTS MANAGEMENT -->
+    <div id="tab-defs" class="hidden">
+      <div class="panel">
+        <div class="panel-title">👤 تعریف و مدیریت مشتریان</div>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input type="text" id="newCustomerName" placeholder="نام مشتری جدید..." />
+          <button class="btn-primary" style="width:auto; padding:0 18px; margin:0;" onclick="addCustomerFromInput()">افزودن</button>
+        </div>
+        <div id="customersManageList" class="manage-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">⚙️ تعریف و مدیریت کالاها</div>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input type="text" id="newProductName" placeholder="نام کالا یا قطعه جدید..." />
+          <button class="btn-primary" style="width:auto; padding:0 18px; margin:0;" onclick="addProductFromInput()">افزودن</button>
+        </div>
+        <div id="productsManageList" class="manage-list"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: BACKUP & SETTINGS -->
+    <div id="tab-backup" class="hidden">
+      <div class="panel">
+        <div class="panel-title">
+          <span>💾 پشتیبان‌گیری دستی (فایل JSON)</span>
+          <span id="dbSizeInfo" style="font-size:0.78em; color:var(--muted);"></span>
+        </div>
+        <div class="row-2">
+          <button class="btn-primary" onclick="exportBackupJSON()">📤 اشتراک / ذخیره بکاپ</button>
+          <button class="btn-primary" style="background:var(--panel-soft); color:var(--text); border:1px solid var(--line);" onclick="document.getElementById('importFile').click()">📥 بازیابی از فایل</button>
+          <input type="file" id="importFile" accept=".json" class="hidden" onchange="importBackupJSON(event)" />
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">☁️ همگام‌سازی ابری Nextcloud (WebDAV)</div>
+        <div class="form-group">
+          <div class="form-label">آدرس WebDAV سرور نکست‌کلاد:</div>
+          <input type="text" id="ncUrl" placeholder="https://cloud.example.com/remote.php/dav/files/USER/" style="direction:ltr;" />
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <div class="form-label">نام کاربری:</div>
+            <input type="text" id="ncUser" style="direction:ltr;" />
+          </div>
+          <div class="form-group">
+            <div class="form-label">رمز عبور (App Password):</div>
+            <input type="password" id="ncPass" style="direction:ltr;" />
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">نام فایل بکاپ در سرور:</div>
+          <input type="text" id="ncFile" value="workshop-output-backup.json" style="direction:ltr;" />
+        </div>
+        <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="ncAuto" style="width:18px; height:18px;" />
+          <label for="ncAuto" style="font-size:0.9em;">بکاپ خودکار پس از هر تغییر</label>
+        </div>
+        <button class="btn-primary" style="margin-bottom:10px;" onclick="saveNcConfig()">ذخیره تنظیمات Nextcloud</button>
+        <div class="row-2">
+          <button class="mini-btn" style="padding:10px; font-weight:700; color:var(--accent);" onclick="uploadToNextcloud(false)">☁️ آپلود به Nextcloud</button>
+          <button class="mini-btn" style="padding:10px; font-weight:700; color:var(--ok);" onclick="downloadFromNextcloud()">🔄 بازیابی از Nextcloud</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🎨 اندازه فونت برنامه</div>
+        <div class="date-helpers">
+          <span class="mini-btn" onclick="setFontSize(14)">کوچک (14)</span>
+          <span class="mini-btn" onclick="setFontSize(15)">متوسط (15)</span>
+          <span class="mini-btn" onclick="setFontSize(17)">بزرگ (17)</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    /* ========= 1. JALALI DATE & MONTH NAMES ========= */
+    const JALALI_MONTHS = [
+      'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+      'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+    ];
+
+    function gregorianToJalali(gy, gm, gd) {
+      const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+      let gy2 = (gm > 2) ? (gy + 1) : gy;
+      let days = 355666 + (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) + gd + g_d_m[gm - 1];
+      let jy = -1595 + (33 * Math.floor(days / 12053));
+      days %= 12053;
+      jy += 4 * Math.floor(days / 1461);
+      days %= 1461;
+      if (days > 365) {
+        jy += Math.floor((days - 1) / 365);
+        days = (days - 1) % 365;
+      }
+      let jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+      let jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+      return [jy, jm, jd];
+    }
+
+    function jalaliToGregorian(jy, jm, jd) {
+      jy += 1595;
+      let days = -355668 + (365 * jy) + (Math.floor(jy / 33) * 8) + Math.floor(((jy % 33) + 3) / 4) + jd + ((jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30) + 186);
+      let gy = 400 * Math.floor(days / 146097);
+      days %= 146097;
+      if (days > 36524) {
+        gy += 100 * Math.floor(--days / 36524);
+        days %= 36524;
+        if (days >= 365) days++;
+      }
+      gy += 4 * Math.floor(days / 1461);
+      days %= 1461;
+      if (days > 365) {
+        gy += Math.floor((days - 1) / 365);
+        days = (days - 1) % 365;
+      }
+      let gd = days + 1;
+      const sal_a = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      let gm;
+      for (gm = 0; gm < 13 && gd > sal_a[gm]; gm++) gd -= sal_a[gm];
+      return [gy, gm, gd];
+    }
+
+    function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function getTodayJalali() {
+      const now = new Date();
+      const [jy, jm, jd] = gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+      return `${jy}/${pad2(jm)}/${pad2(jd)}`;
+    }
+
+    function setToday() {
+      document.getElementById('dateInput').value = getTodayJalali();
+    }
+
+    function shiftDate(offsetDays) {
+      const val = document.getElementById('dateInput').value.trim();
+      const parts = val.split('/').map(Number);
+      let gDate = new Date();
+      if (parts.length === 3 && parts[0] > 1300) {
+        const [gy, gm, gd] = jalaliToGregorian(parts[0], parts[1], parts[2]);
+        gDate = new Date(gy, gm - 1, gd);
+      }
+      gDate.setDate(gDate.getDate() + offsetDays);
+      const [jy, jm, jd] = gregorianToJalali(gDate.getFullYear(), gDate.getMonth() + 1, gDate.getDate());
+      document.getElementById('dateInput').value = `${jy}/${pad2(jm)}/${pad2(jd)}`;
+    }
+
+    function formatMonthLabel(ym) {
+      const parts = ym.split('/');
+      if (parts.length !== 2) return ym;
+      const mIdx = parseInt(parts[1], 10) - 1;
+      const mName = JALALI_MONTHS[mIdx] || parts[1];
+      return `${mName} ${parts[0]}`;
+    }
+
+    /* ========= 2. CUSTOM DROPDOWN LOGIC ========= */
+    function toggleDD(id) {
+      const el = document.getElementById(id);
+      const isOpen = el.classList.contains('open');
+      closeAllDD();
+      if (!isOpen) el.classList.add('open');
+    }
+
+    function closeAllDD() {
+      document.querySelectorAll('.custom-dd.open').forEach(d => d.classList.remove('open'));
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.custom-dd')) closeAllDD();
+    });
+
+    function filterDDItems(containerId, query) {
+      const q = query.trim().toLowerCase();
+      const items = document.querySelectorAll(`#${containerId} .custom-dd-item`);
+      items.forEach(item => {
+        const txt = item.textContent.toLowerCase();
+        item.style.display = txt.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    /* ========= 3. INDEXEDDB & STATE ========= */
+    const DB_NAME = 'WorkshopOutputDB';
+    const DB_VERSION = 1;
+    let db = null;
+    const TOP_CHIPS_COUNT = 5;
+
+    let state = {
+      customers: [],
+      products: [],
+      records: [],
+      selectedCustomer: '',
+      selectedProduct: '',
+      filterCustomer: 'ALL',
+      filterProduct: 'ALL',
+      filterMonth: 'ALL',
+      filterStatus: 'UNFINISHED'
+    };
+
+    const STATUS_OPTIONS = [
+      { value: 'UNFINISHED', label: '⏳ تکمیل نشده‌ها (تیک نخورده)' },
+      { value: 'NO_WAREHOUSE', label: '📦 بدون تیک رسید انبار' },
+      { value: 'NO_INVOICE', label: '🧾 بدون تیک فاکتور' },
+      { value: 'FINISHED', label: '✅ تکمیل شده‌ها' },
+      { value: 'ALL', label: '📋 نمایش همه موارد' }
+    ];
+
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const d = e.target.result;
+          if (!d.objectStoreNames.contains('meta')) d.createObjectStore('meta', { keyPath: 'key' });
+          if (!d.objectStoreNames.contains('records')) d.createObjectStore('records', { keyPath: 'id' });
+        };
+        req.onsuccess = (e) => { db = e.target.result; resolve(); };
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    async function loadAllData() {
+      return new Promise((resolve) => {
+        const tx = db.transaction(['meta', 'records'], 'readonly');
+        const metaStore = tx.objectStore('meta');
+        const recStore = tx.objectStore('records');
+
+        const cReq = metaStore.get('customers');
+        const pReq = metaStore.get('products');
+        const rReq = recStore.getAll();
+
+        tx.oncomplete = () => {
+          state.customers = (cReq.result && cReq.result.list) ? cReq.result.list : [];
+          state.products = (pReq.result && pReq.result.list) ? pReq.result.list : [];
+          state.records = rReq.result || [];
+          state.records.sort((a, b) => (b.date.localeCompare(a.date) || b.createdAt - a.createdAt));
+
+          if (!state.selectedCustomer && state.customers.length > 0) state.selectedCustomer = getTopUsed(state.customers, 'customer')[0];
+          if (!state.selectedProduct && state.products.length > 0) state.selectedProduct = getTopUsed(state.products, 'product')[0];
+          updateBackupSizeInfo();
+          resolve();
+        };
+      });
+    }
+
+    function getTopUsed(list, fieldKey) {
+      const counts = {};
+      list.forEach(item => counts[item] = 0);
+      state.records.forEach(r => {
+        const val = r[fieldKey];
+        if (counts[val] !== undefined) counts[val]++;
+      });
+      return [...list].sort((a, b) => counts[b] - counts[a]);
+    }
+
+    function saveMetaList(key, list) {
+      return new Promise((resolve) => {
+        const tx = db.transaction('meta', 'readwrite');
+        tx.objectStore('meta').put({ key, list });
+        tx.oncomplete = () => { triggerAutoSync(); resolve(); };
+      });
+    }
+
+    function putRecordDB(record) {
+      return new Promise((resolve) => {
+        const tx = db.transaction('records', 'readwrite');
+        tx.objectStore('records').put(record);
+        tx.oncomplete = () => {
+          updateBackupSizeInfo();
+          triggerAutoSync();
+          resolve();
+        };
+      });
+    }
+
+    function deleteRecordDB(id) {
+      return new Promise((resolve) => {
+        const tx = db.transaction('records', 'readwrite');
+        tx.objectStore('records').delete(id);
+        tx.oncomplete = () => {
+          updateBackupSizeInfo();
+          triggerAutoSync();
+          resolve();
+        };
+      });
+    }
+
+    function updateBackupSizeInfo() {
+      const el = document.getElementById('dbSizeInfo');
+      if (!el) return;
+      const bytes = new Blob([JSON.stringify(getFullBackupObject())]).size;
+      const kb = (bytes / 1024).toFixed(1);
+      el.textContent = `${state.records.length} رکورد (${kb} کیلوبایت)`;
+    }
+
+    /* ========= 4. UI RENDERING ========= */
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2300);
+    }
+
+    function switchTab(tab) {
+      ['main', 'defs', 'backup'].forEach(id => {
+        document.getElementById('tab-' + id).classList.toggle('hidden', id !== tab);
+      });
+      const btns = document.querySelectorAll('.tab-btn');
+      btns[0].classList.toggle('active', tab === 'main');
+      btns[1].classList.toggle('active', tab === 'defs');
+      btns[2].classList.toggle('active', tab === 'backup');
+    }
+
+    function renderSelectors() {
+      // 1. Customer Top Frequent Chips + Custom Dropdown
+      const cWrap = document.getElementById('customerChips');
+      cWrap.innerHTML = '';
+      if (state.customers.length === 0) {
+        cWrap.innerHTML = `<div class="chip chip-empty" onclick="switchTab('defs')">⚠️ از تب «مشتری / کالا» مشتری تعریف کنید</div>`;
+      } else {
+        const sortedC = getTopUsed(state.customers, 'customer');
+        const topC = sortedC.slice(0, TOP_CHIPS_COUNT);
+        if (state.selectedCustomer && !topC.includes(state.selectedCustomer) && state.customers.includes(state.selectedCustomer)) {
+          topC.push(state.selectedCustomer);
+        }
+        topC.forEach(c => {
+          const el = document.createElement('div');
+          el.className = 'chip' + (state.selectedCustomer === c ? ' selected' : '');
+          el.textContent = c;
+          el.onclick = () => { state.selectedCustomer = c; renderSelectors(); };
+          cWrap.appendChild(el);
+        });
+      }
+
+      document.getElementById('dd-customer-label').textContent = state.selectedCustomer
+        ? `مشتری انتخابی: ${state.selectedCustomer} (مشاهده کل ${state.customers.length} مورد)`
+        : `انتخاب از کل لیست مشتریان (${state.customers.length})...`;
+
+      const ddCustItems = document.getElementById('dd-customer-items');
+      ddCustItems.innerHTML = state.customers.map(c => `
+        <div class="custom-dd-item ${state.selectedCustomer === c ? 'selected' : ''}" onclick="selectCustomer('${c}')">
+          <span>${c}</span>
+          ${state.selectedCustomer === c ? '<span>✓</span>' : ''}
+        </div>
+      `).join('');
+
+      // 2. Product Top Frequent Chips + Custom Dropdown
+      const pWrap = document.getElementById('productChips');
+      pWrap.innerHTML = '';
+      if (state.products.length === 0) {
+        pWrap.innerHTML = `<div class="chip chip-empty" onclick="switchTab('defs')">⚠️ از تب «مشتری / کالا» کالا تعریف کنید</div>`;
+      } else {
+        const sortedP = getTopUsed(state.products, 'product');
+        const topP = sortedP.slice(0, TOP_CHIPS_COUNT);
+        if (state.selectedProduct && !topP.includes(state.selectedProduct) && state.products.includes(state.selectedProduct)) {
+          topP.push(state.selectedProduct);
+        }
+        topP.forEach(p => {
+          const el = document.createElement('div');
+          el.className = 'chip' + (state.selectedProduct === p ? ' selected' : '');
+          el.textContent = p;
+          el.onclick = () => { state.selectedProduct = p; renderSelectors(); };
+          pWrap.appendChild(el);
+        });
+      }
+
+      document.getElementById('dd-product-label').textContent = state.selectedProduct
+        ? `کالای انتخابی: ${state.selectedProduct} (مشاهده کل ${state.products.length} مورد)`
+        : `انتخاب از کل لیست کالاها (${state.products.length})...`;
+
+      const ddProdItems = document.getElementById('dd-product-items');
+      ddProdItems.innerHTML = state.products.map(p => `
+        <div class="custom-dd-item ${state.selectedProduct === p ? 'selected' : ''}" onclick="selectProduct('${p}')">
+          <span>${p}</span>
+          ${state.selectedProduct === p ? '<span>✓</span>' : ''}
+        </div>
+      `).join('');
+
+      // 3. Filter Custom Dropdowns
+      renderFilterDropdowns();
+
+      // 4. Manage Lists in Tab 2
+      document.getElementById('customersManageList').innerHTML = state.customers.map(c => `
+        <div class="manage-pill">
+          <span>${c}</span>
+          <button onclick="removeCustomer('${c}')">✕</button>
+        </div>
+      `).join('');
+
+      document.getElementById('productsManageList').innerHTML = state.products.map(p => `
+        <div class="manage-pill">
+          <span>${p}</span>
+          <button onclick="removeProduct('${p}')">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function renderFilterDropdowns() {
+      // Customer Filter DD
+      document.getElementById('filterCustomerText').textContent = state.filterCustomer === 'ALL' ? 'همه مشتریان' : state.filterCustomer;
+      const fCustMenu = document.getElementById('filterCustomerMenu');
+      fCustMenu.innerHTML = [
+        `<div class="custom-dd-item ${state.filterCustomer === 'ALL' ? 'selected' : ''}" onclick="setFilter('filterCustomer', 'ALL')"><span>همه مشتریان</span></div>`,
+        ...state.customers.map(c => `<div class="custom-dd-item ${state.filterCustomer === c ? 'selected' : ''}" onclick="setFilter('filterCustomer', '${c}')"><span>${c}</span></div>`)
+      ].join('');
+
+      // Product Filter DD
+      document.getElementById('filterProductText').textContent = state.filterProduct === 'ALL' ? 'همه کالاها' : state.filterProduct;
+      const fProdMenu = document.getElementById('filterProductMenu');
+      fProdMenu.innerHTML = [
+        `<div class="custom-dd-item ${state.filterProduct === 'ALL' ? 'selected' : ''}" onclick="setFilter('filterProduct', 'ALL')"><span>همه کالاها</span></div>`,
+        ...state.products.map(p => `<div class="custom-dd-item ${state.filterProduct === p ? 'selected' : ''}" onclick="setFilter('filterProduct', '${p}')"><span>${p}</span></div>`)
+      ].join('');
+
+      // Month Archive Filter DD
+      const uniqueMonths = [...new Set(state.records.map(r => (r.date || '').slice(0, 7)).filter(m => m.length === 7))].sort().reverse();
+      document.getElementById('filterMonthText').textContent = state.filterMonth === 'ALL' ? 'همه زمان‌ها' : formatMonthLabel(state.filterMonth);
+      const fMonthMenu = document.getElementById('filterMonthMenu');
+      fMonthMenu.innerHTML = [
+        `<div class="custom-dd-item ${state.filterMonth === 'ALL' ? 'selected' : ''}" onclick="setFilter('filterMonth', 'ALL')"><span>همه زمان‌ها</span></div>`,
+        ...uniqueMonths.map(m => `<div class="custom-dd-item ${state.filterMonth === m ? 'selected' : ''}" onclick="setFilter('filterMonth', '${m}')"><span>${formatMonthLabel(m)}</span><span style="font-size:0.8em;color:var(--muted);">${m}</span></div>`)
+      ].join('');
+
+      // Status Filter DD
+      const curStatObj = STATUS_OPTIONS.find(s => s.value === state.filterStatus) || STATUS_OPTIONS[0];
+      document.getElementById('filterStatusText').textContent = curStatObj.label;
+      const fStatMenu = document.getElementById('filterStatusMenu');
+      fStatMenu.innerHTML = STATUS_OPTIONS.map(s => `
+        <div class="custom-dd-item ${state.filterStatus === s.value ? 'selected' : ''}" onclick="setFilter('filterStatus', '${s.value}')">
+          <span>${s.label}</span>
+        </div>
+      `).join('');
+    }
+
+    function selectCustomer(c) {
+      state.selectedCustomer = c;
+      closeAllDD();
+      renderSelectors();
+    }
+
+    function selectProduct(p) {
+      state.selectedProduct = p;
+      closeAllDD();
+      renderSelectors();
+    }
+
+    function setFilter(key, val) {
+      state[key] = val;
+      closeAllDD();
+      renderFilterDropdowns();
+      renderRecords();
+    }
+
+    async function addCustomerFromInput() {
+      const inp = document.getElementById('newCustomerName');
+      const clean = inp.value.trim();
+      if (!clean) return;
+      if (!state.customers.includes(clean)) {
+        state.customers.push(clean);
+        await saveMetaList('customers', state.customers);
+        state.selectedCustomer = clean;
+      }
+      inp.value = '';
+      renderSelectors();
+      showToast('مشتری ثبت شد');
+    }
+
+    async function addProductFromInput() {
+      const inp = document.getElementById('newProductName');
+      const clean = inp.value.trim();
+      if (!clean) return;
+      if (!state.products.includes(clean)) {
+        state.products.push(clean);
+        await saveMetaList('products', state.products);
+        state.selectedProduct = clean;
+      }
+      inp.value = '';
+      renderSelectors();
+      showToast('کالا ثبت شد');
+    }
+
+    async function removeCustomer(name) {
+      if (!confirm(`آیا "${name}" از لیست مشتریان حذف شود؟`)) return;
+      state.customers = state.customers.filter(c => c !== name);
+      if (state.selectedCustomer === name) state.selectedCustomer = state.customers[0] || '';
+      await saveMetaList('customers', state.customers);
+      renderSelectors();
+    }
+
+    async function removeProduct(name) {
+      if (!confirm(`آیا "${name}" از لیست کالاها حذف شود؟`)) return;
+      state.products = state.products.filter(p => p !== name);
+      if (state.selectedProduct === name) state.selectedProduct = state.products[0] || '';
+      await saveMetaList('products', state.products);
+      renderSelectors();
+    }
+
+    function addQty(val) {
+      const inp = document.getElementById('qtyInput');
+      const cur = parseFloat(inp.value) || 0;
+      inp.value = cur + val;
+    }
+
+    async function saveRecord() {
+      if (!state.selectedCustomer) return showToast('لطفاً ابتدا یک مشتری انتخاب کنید');
+      if (!state.selectedProduct) return showToast('لطفاً ابتدا یک کالا انتخاب کنید');
+
+      const qty = parseFloat(document.getElementById('qtyInput').value);
+      if (!qty || qty <= 0) return showToast('لطفاً تعداد کالا را وارد کنید');
+
+      const date = document.getElementById('dateInput').value.trim() || getTodayJalali();
+      const note = document.getElementById('noteInput').value.trim();
+
+      const rec = {
+        id: 'rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        customer: state.selectedCustomer,
+        product: state.selectedProduct,
+        qty: qty,
+        date: date,
+        note: note,
+        warehouseTick: false,
+        invoiceTick: false,
+        createdAt: Date.now()
+      };
+
+      state.records.unshift(rec);
+      await putRecordDB(rec);
+
+      document.getElementById('qtyInput').value = '';
+      document.getElementById('noteInput').value = '';
+      renderSelectors();
+      renderRecords();
+      showToast('✅ خروجی ثبت شد');
+    }
+
+    async function toggleTick(id, field) {
+      const rec = state.records.find(r => r.id === id);
+      if (!rec) return;
+      rec[field] = !rec[field];
+      await putRecordDB(rec);
+      renderRecords();
+    }
+
+    async function deleteRecord(id) {
+      if (!confirm('این ردیف خروجی حذف شود؟')) return;
+      state.records = state.records.filter(r => r.id !== id);
+      await deleteRecordDB(id);
+      renderSelectors();
+      renderRecords();
+      showToast('حذف شد');
+    }
+
+    function resetFilters() {
+      state.filterCustomer = 'ALL';
+      state.filterProduct = 'ALL';
+      state.filterMonth = 'ALL';
+      state.filterStatus = 'UNFINISHED';
+      document.getElementById('searchQuery').value = '';
+      renderFilterDropdowns();
+      renderRecords();
+    }
+
+    function renderRecords() {
+      const fCust = state.filterCustomer;
+      const fProd = state.filterProduct;
+      const fMonth = state.filterMonth;
+      const fStat = state.filterStatus;
+      const q = document.getElementById('searchQuery').value.trim().toLowerCase();
+
+      const baseMatches = state.records.filter(r => {
+        if (fCust !== 'ALL' && r.customer !== fCust) return false;
+        if (fProd !== 'ALL' && r.product !== fProd) return false;
+        if (fMonth !== 'ALL' && !(r.date || '').startsWith(fMonth)) return false;
+        if (q) {
+          const hay = `${r.date} ${r.note || ''} ${r.customer} ${r.product}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      let noWarehouseSum = 0;
+      let noInvoiceSum = 0;
+      baseMatches.forEach(r => {
+        if (!r.warehouseTick) noWarehouseSum += Number(r.qty) || 0;
+        if (!r.invoiceTick) noInvoiceSum += Number(r.qty) || 0;
+      });
+
+      const filtered = baseMatches.filter(r => {
+        if (fStat === 'UNFINISHED') return !r.warehouseTick || !r.invoiceTick;
+        if (fStat === 'NO_WAREHOUSE') return !r.warehouseTick;
+        if (fStat === 'NO_INVOICE') return !r.invoiceTick;
+        if (fStat === 'FINISHED') return r.warehouseTick && r.invoiceTick;
+        return true;
+      });
+
+      const totalFilteredQty = filtered.reduce((acc, r) => acc + (Number(r.qty) || 0), 0);
+
+      document.getElementById('sumTotalQty').textContent = totalFilteredQty.toLocaleString('fa-IR');
+      document.getElementById('sumNoWarehouse').textContent = noWarehouseSum.toLocaleString('fa-IR');
+      document.getElementById('sumNoInvoice').textContent = noInvoiceSum.toLocaleString('fa-IR');
+
+      const listEl = document.getElementById('recordsList');
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="empty-state">موردی با این فیلتر پیدا نشد.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(r => {
+        const bothDone = r.warehouseTick && r.invoiceTick;
+        const oneDone = (r.warehouseTick || r.invoiceTick) && !bothDone;
+        const cardClass = bothDone ? 'done-all' : (oneDone ? 'done-partial' : '');
+
+        return `
+          <div class="item-card ${cardClass}">
+            <div class="item-top">
+              <div>
+                <span class="item-title">${r.product}</span>
+                <span class="item-customer">👤 ${r.customer}</span>
+              </div>
+              <div class="item-qty">${Number(r.qty).toLocaleString('fa-IR')} عدد</div>
+            </div>
+
+            <div class="item-meta">
+              <span>📅 تاریخ: <b>${r.date}</b> ${r.note ? ` | 📝 ${r.note}` : ''}</span>
+              <button class="icon-btn" onclick="deleteRecord('${r.id}')" title="حذف">🗑️</button>
+            </div>
+
+            <div class="checks-row">
+              <button class="check-btn ${r.warehouseTick ? 'checked-warehouse' : ''}" onclick="toggleTick('${r.id}', 'warehouseTick')">
+                <span class="check-icon">${r.warehouseTick ? '✓' : ''}</span>
+                <span>رسید انبار</span>
+              </button>
+
+              <button class="check-btn ${r.invoiceTick ? 'checked-invoice' : ''}" onclick="toggleTick('${r.id}', 'invoiceTick')">
+                <span class="check-icon">${r.invoiceTick ? '✓' : ''}</span>
+                <span>ثبت فاکتور</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ========= 5. BACKUP (CORDOVA + NEXTCLOUD WEBDAV) ========= */
+    function getFullBackupObject() {
+      return {
+        app: 'WorkshopOutputsApp',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        customers: state.customers,
+        products: state.products,
+        records: state.records
+      };
+    }
+
+    async function restoreFromObject(data) {
+      if (!data || !Array.isArray(data.records)) {
+        return showToast('❌ فایل بکاپ معتبر نیست');
+      }
+      state.customers = Array.isArray(data.customers) ? data.customers : [];
+      state.products = Array.isArray(data.products) ? data.products : [];
+      state.records = data.records;
+
+      const tx = db.transaction(['meta', 'records'], 'readwrite');
+      tx.objectStore('meta').put({ key: 'customers', list: state.customers });
+      tx.objectStore('meta').put({ key: 'products', list: state.products });
+      const recStore = tx.objectStore('records');
+      recStore.clear();
+      state.records.forEach(r => recStore.put(r));
+
+      tx.oncomplete = async () => {
+        await loadAllData();
+        renderSelectors();
+        renderRecords();
+        showToast('✅ اطلاعات با موفقیت بازیابی شد');
+      };
+    }
+
+    function exportBackupJSON() {
+      const jsonStr = JSON.stringify(getFullBackupObject(), null, 2);
+      const fileName = `workshop-backup-${getTodayJalali().replace(/\//g, '-')}.json`;
+
+      // Cordova Native Share Plugin Support
+      if (window.plugins && window.plugins.socialsharing) {
+        const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
+        const df = `data:application/json;base64,${base64Data}`;
+        window.plugins.socialsharing.shareWithOptions({
+          message: 'فایل بکاپ خروجی کارگاه',
+          subject: fileName,
+          files: [df]
+        });
+        return;
+      }
+
+      if (navigator.share && window.File) {
+        const file = new File([jsonStr], fileName, { type: 'application/json' });
+        navigator.share({ title: 'Backup Workshop', files: [file] }).catch(() => downloadFallback(jsonStr, fileName));
+      } else {
+        downloadFallback(jsonStr, fileName);
+      }
+    }
+
+    function downloadFallback(jsonStr, fileName) {
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = fileName;
+      a.click();
+      showToast('فایل بکاپ آماده شد');
+    }
+
+    function importBackupJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          restoreFromObject(parsed);
+        } catch (err) {
+          showToast('خطا در خواندن فایل JSON');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function loadNcConfig() {
+      try {
+        const raw = localStorage.getItem('ncConfig_workshop');
+        if (!raw) return;
+        const cfg = JSON.parse(raw);
+        document.getElementById('ncUrl').value = cfg.url || '';
+        document.getElementById('ncUser').value = cfg.user || '';
+        document.getElementById('ncPass').value = cfg.pass || '';
+        document.getElementById('ncFile').value = cfg.file || 'workshop-output-backup.json';
+        document.getElementById('ncAuto').checked = !!cfg.auto;
+      } catch (e) {}
+    }
+
+    function saveNcConfig() {
+      const cfg = {
+        url: document.getElementById('ncUrl').value.trim(),
+        user: document.getElementById('ncUser').value.trim(),
+        pass: document.getElementById('ncPass').value.trim(),
+        file: document.getElementById('ncFile').value.trim() || 'workshop-output-backup.json',
+        auto: document.getElementById('ncAuto').checked
+      };
+      localStorage.setItem('ncConfig_workshop', JSON.stringify(cfg));
+      showToast('تنظیمات Nextcloud ذخیره شد');
+    }
+
+    async function uploadToNextcloud(silent = false) {
+      const raw = localStorage.getItem('ncConfig_workshop');
+      if (!raw) return !silent && showToast('ابتدا تنظیمات Nextcloud را ذخیره کنید');
+      const cfg = JSON.parse(raw);
+      if (!cfg.url || !cfg.user || !cfg.pass) return !silent && showToast('اطلاعات Nextcloud ناقص است');
+
+      const baseUrl = cfg.url.endsWith('/') ? cfg.url : cfg.url + '/';
+      const fullUrl = baseUrl + cfg.file;
+      const bodyStr = JSON.stringify(getFullBackupObject());
+      const authHeader = 'Basic ' + btoa(cfg.user + ':' + cfg.pass);
+
+      // Use Cordova Advanced HTTP if on Android APK to bypass CORS
+      if (window.cordova && window.cordova.plugin && window.cordova.plugin.http) {
+        window.cordova.plugin.http.setServerTrustMode('nocheck', () => {}, () => {});
+        window.cordova.plugin.http.sendRequest(fullUrl, {
+          method: 'put',
+          serializer: 'utf8',
+          data: bodyStr,
+          headers: { 'Authorization': authHeader, 'Content-Type': 'application/json' }
+        }, () => {
+          if (!silent) showToast('☁️ بکاپ در Nextcloud ذخیره شد');
+        }, (err) => {
+          if (!silent) showToast('خطا در آپلود: ' + (err.status || ''));
+        });
+        return;
+      }
+
+      try {
+        const res = await fetch(fullUrl, {
+          method: 'PUT',
+          headers: { 'Authorization': authHeader, 'Content-Type': 'application/json' },
+          body: bodyStr
+        });
+        if (res.ok || res.status === 201 || res.status === 204) {
+          if (!silent) showToast('☁️ بکاپ در Nextcloud ذخیره شد');
+        } else {
+          if (!silent) showToast('خطا در آپلود: ' + res.status);
+        }
+      } catch (err) {
+        if (!silent) showToast('خطای ارتباط با سرور Nextcloud');
+      }
+    }
+
+    async function downloadFromNextcloud() {
+      const raw = localStorage.getItem('ncConfig_workshop');
+      if (!raw) return showToast('ابتدا تنظیمات Nextcloud را ذخیره کنید');
+      const cfg = JSON.parse(raw);
+      const baseUrl = cfg.url.endsWith('/') ? cfg.url : cfg.url + '/';
+      const fullUrl = baseUrl + cfg.file;
+      const authHeader = 'Basic ' + btoa(cfg.user + ':' + cfg.pass);
+
+      if (window.cordova && window.cordova.plugin && window.cordova.plugin.http) {
+        window.cordova.plugin.http.setServerTrustMode('nocheck', () => {}, () => {});
+        window.cordova.plugin.http.sendRequest(fullUrl, {
+          method: 'get',
+          headers: { 'Authorization': authHeader }
+        }, async (res) => {
+          try {
+            const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+            await restoreFromObject(data);
+          } catch (e) {
+            showToast('خطا در خواندن داده دریافتی');
+          }
+        }, (err) => {
+          showToast('خطا در دریافت فایل: ' + (err.status || ''));
+        });
+        return;
+      }
+
+      try {
+        const res = await fetch(fullUrl, {
+          method: 'GET',
+          headers: { 'Authorization': authHeader }
+        });
+        if (!res.ok) return showToast('خطا در دریافت فایل: ' + res.status);
+        const data = await res.json();
+        await restoreFromObject(data);
+      } catch (err) {
+        showToast('خطا در دریافت اطلاعات از Nextcloud');
+      }
+    }
+
+    function triggerAutoSync() {
+      try {
+        const cfg = JSON.parse(localStorage.getItem('ncConfig_workshop') || '{}');
+        if (cfg.auto) uploadToNextcloud(true);
+      } catch (e) {}
+    }
+
+    function setFontSize(px) {
+      document.documentElement.style.setProperty('--fz', px + 'px');
+      localStorage.setItem('workshop_fz', px);
+    }
+
+    /* ========= INIT ========= */
+    window.addEventListener('DOMContentLoaded', async () => {
+      const savedFz = localStorage.getItem('workshop_fz');
+      if (savedFz) setFontSize(savedFz);
+
+      setToday();
+      loadNcConfig();
+      await initDB();
+      await loadAllData();
+      renderSelectors();
+      renderRecords();
+    });
+  </script>
+</body>
+</html>
