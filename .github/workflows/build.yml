@@ -1,0 +1,41 @@
+name: Build Workshop Output APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install -g cordova
+
+      - run: |
+          cordova create app com.kargah.output "خروجی کارگاه"
+          rm -rf app/www/* && cp index.html app/www/
+          if [ -f icon.png ]; then
+            cp icon.png app/
+            sed -i 's|</widget>|    <icon src="icon.png" />\n</widget>|' app/config.xml
+          fi
+          sed -i 's|</widget>|    <access origin="*" />\n    <allow-navigation href="*" />\n    <preference name="AndroidInsecureFileModeEnabled" value="true" />\n</widget>|' app/config.xml
+          cd app
+          cordova plugin add cordova-plugin-x-socialsharing
+          cordova plugin add cordova-plugin-advanced-http
+          cordova platform add android && cordova build android
+          find . -name "*.apk" -exec cp {} ../ \;
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WorkshopOutput-APK
+          path: "*.apk"
