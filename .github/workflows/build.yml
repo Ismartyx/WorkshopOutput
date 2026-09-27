@@ -1,8 +1,12 @@
 name: Build Workshop Output APK
+
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -19,9 +23,22 @@ jobs:
         with:
           node-version: '20'
 
-      - run: npm install -g cordova
+      - name: Create Permanent Keystore
+        run: |
+          if [ ! -f output.keystore ]; then
+            keytool -genkey -v -keystore output.keystore -alias output -keyalg RSA -keysize 2048 -validity 10000 -storepass outputpass -keypass outputpass -dname "CN=Workshop Output"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add output.keystore
+            git commit -m "Add permanent keystore [skip ci]" || true
+            git push origin HEAD:main || true
+          fi
 
-      - run: |
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      - name: Build Signed APK
+        run: |
           cordova create app com.kargah.output "خروجی کارگاه"
           rm -rf app/www/* && cp index.html app/www/
           if [ -f icon.png ]; then
@@ -30,12 +47,26 @@ jobs:
           fi
           sed -i 's|</widget>|    <access origin="*" />\n    <allow-navigation href="*" />\n    <preference name="AndroidInsecureFileModeEnabled" value="true" />\n</widget>|' app/config.xml
           cd app
+          cat <<EOF > build.json
+          {
+            "android": {
+              "release": {
+                "keystore": "$GITHUB_WORKSPACE/output.keystore",
+                "storePassword": "outputpass",
+                "alias": "output",
+                "password" : "outputpass",
+                "keystoreType": ""
+              }
+            }
+          }
+          EOF
           cordova plugin add cordova-plugin-x-socialsharing
           cordova plugin add cordova-plugin-advanced-http
-          cordova platform add android && cordova build android
-          find . -name "*.apk" -exec cp {} ../ \;
+          cordova platform add android
+          cordova build android --release --buildConfig=build.json
+          find platforms/android/app/build/outputs/apk/release/ -name "*.apk" -exec cp {} ../WorkshopOutput.apk \;
 
       - uses: actions/upload-artifact@v4
         with:
           name: WorkshopOutput-APK
-          path: "*.apk"
+          path: "WorkshopOutput.apk"
