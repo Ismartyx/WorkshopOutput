@@ -43,19 +43,19 @@
     header {
       background: var(--panel);
       border-bottom: 1px solid var(--line);
-      padding: 12px 14px;
+      padding: 10px 12px;
       position: sticky;
       top: 0;
       z-index: 100;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
     }
 
     .app-title {
       font-weight: 800;
-      font-size: 1.02em;
+      font-size: 1em;
       color: var(--accent);
       display: flex;
       align-items: center;
@@ -65,16 +65,16 @@
 
     .nav-tabs {
       display: flex;
-      gap: 5px;
+      gap: 4px;
     }
 
     .tab-btn {
       background: var(--panel-soft);
       color: var(--muted);
       border: 1px solid var(--line);
-      padding: 7px 11px;
+      padding: 6px 10px;
       border-radius: 10px;
-      font-size: 0.85em;
+      font-size: 0.84em;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -178,7 +178,7 @@
       font-size: 0.84em;
     }
 
-    /* Custom Dropdown (custom-dd) like FinanceApp */
+    /* Custom Dropdown (custom-dd) */
     .custom-dd {
       position: relative;
       width: 100%;
@@ -408,6 +408,16 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .author-badge {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 0.92em;
+      color: var(--text);
     }
 
     .checks-row {
@@ -527,7 +537,7 @@
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('main')">ثبت و لیست</button>
       <button class="tab-btn" onclick="switchTab('defs')">مشتری / کالا</button>
-      <button class="tab-btn" onclick="switchTab('backup')">بکاپ</button>
+      <button class="tab-btn" onclick="switchTab('backup')">بکاپ و ادغام</button>
     </div>
   </header>
 
@@ -542,7 +552,7 @@
           <span>➕ ثبت خروجی جدید</span>
         </div>
 
-        <!-- Customer Selection (Top Frequent + Custom Dropdown) -->
+        <!-- Customer Selection -->
         <div class="form-group">
           <div class="form-label">
             <span>👤 مشتری (پرمصرف‌ها):</span>
@@ -560,7 +570,7 @@
           </div>
         </div>
 
-        <!-- Product Selection (Top Frequent + Custom Dropdown) -->
+        <!-- Product Selection -->
         <div class="form-group">
           <div class="form-label">
             <span>⚙️ کالا / قطعه (پرمصرف‌ها):</span>
@@ -615,7 +625,6 @@
           <button class="mini-btn" style="flex:0; white-space:nowrap;" onclick="resetFilters()">نمایش پیش‌فرض</button>
         </div>
 
-        <!-- Row 1: Customer & Product Custom Dropdowns -->
         <div class="row-2" style="margin-bottom:10px;">
           <div>
             <div class="form-label">فیلتر مشتری:</div>
@@ -640,7 +649,6 @@
           </div>
         </div>
 
-        <!-- Row 2: Month/Archive Filter & Tick Status Filter -->
         <div class="row-2" style="margin-bottom:10px;">
           <div>
             <div class="form-label">📅 ماه / آرشیو زمانی:</div>
@@ -665,12 +673,10 @@
           </div>
         </div>
 
-        <!-- Search Box for Notes / Specific Dates -->
         <div class="form-group" style="margin-bottom:12px;">
           <input type="text" id="searchQuery" placeholder="🔎 جستجو در تاریخ دقیق (مثلاً 1405/01) یا توضیحات..." oninput="renderRecords()" />
         </div>
 
-        <!-- Dynamic Summary Banner -->
         <div class="stats-banner">
           <div class="stat-box">
             <span class="stat-val highlight" id="sumTotalQty">0</span>
@@ -686,7 +692,6 @@
           </div>
         </div>
 
-        <!-- Records List -->
         <div id="recordsList"></div>
       </div>
 
@@ -713,25 +718,37 @@
       </div>
     </div>
 
-    <!-- TAB 3: BACKUP & SETTINGS -->
+    <!-- TAB 3: BACKUP, MERGE & NEXTCLOUD -->
     <div id="tab-backup" class="hidden">
       <div class="panel">
         <div class="panel-title">
-          <span>💾 پشتیبان‌گیری دستی (فایل JSON)</span>
+          <span>📲 ارسال و دریافت فایل (ادغام بدون تداخل)</span>
           <span id="dbSizeInfo" style="font-size:0.78em; color:var(--muted);"></span>
         </div>
-        <div class="row-2">
-          <button class="btn-primary" onclick="exportBackupJSON()">📤 اشتراک / ذخیره بکاپ</button>
-          <button class="btn-primary" style="background:var(--panel-soft); color:var(--text); border:1px solid var(--line);" onclick="document.getElementById('importFile').click()">📥 بازیابی از فایل</button>
+        <div class="row-2" style="margin-bottom:12px;">
+          <button class="btn-primary" onclick="exportBackupJSON()">📤 ارسال فایل خروجی</button>
+          <button class="btn-primary" style="background:var(--ok); color:#051b0d;" onclick="document.getElementById('importFile').click()">📥 دریافت و ادغام فایل</button>
           <input type="file" id="importFile" accept=".json" class="hidden" onchange="importBackupJSON(event)" />
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">نام ثبت‌کننده این گوشی (اختیاری):</div>
+          <input type="text" id="deviceAuthor" placeholder="مثلاً: کارگاه / مدیریت" onchange="saveDeviceRole()" />
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="operatorLock" style="width:18px; height:18px;" onchange="saveDeviceRole()" />
+          <label for="operatorLock" style="font-size:0.88em; color:var(--muted);">حالت اپراتور کارگاه (قفل شدن تیک‌های انبار و فاکتور روی این گوشی)</label>
         </div>
       </div>
 
       <div class="panel">
-        <div class="panel-title">☁️ همگام‌سازی ابری Nextcloud (WebDAV)</div>
+        <div class="panel-title">
+          <span>☁️ پشتیبان‌گیری ابری Nextcloud (ویژه مدیریت)</span>
+        </div>
         <div class="form-group">
-          <div class="form-label">آدرس WebDAV سرور نکست‌کلاد:</div>
-          <input type="text" id="ncUrl" placeholder="https://cloud.example.com/remote.php/dav/files/USER/" style="direction:ltr;" />
+          <div class="form-label">آدرس سرور نکست‌کلاد:</div>
+          <input type="text" id="ncUrl" placeholder="https://cloud.example.com" style="direction:ltr;" />
         </div>
         <div class="row-2">
           <div class="form-group">
@@ -744,12 +761,12 @@
           </div>
         </div>
         <div class="form-group">
-          <div class="form-label">نام فایل بکاپ در سرور:</div>
+          <div class="form-label">نام فایل در سرور:</div>
           <input type="text" id="ncFile" value="workshop-output-backup.json" style="direction:ltr;" />
         </div>
         <div class="form-group" style="display:flex; align-items:center; gap:8px;">
           <input type="checkbox" id="ncAuto" style="width:18px; height:18px;" />
-          <label for="ncAuto" style="font-size:0.9em;">بکاپ خودکار پس از هر تغییر</label>
+          <label for="ncAuto" style="font-size:0.9em;">بکاپ خودکار پس از هر تغییر یا دریافت فایل</label>
         </div>
         <button class="btn-primary" style="margin-bottom:10px;" onclick="saveNcConfig()">ذخیره تنظیمات Nextcloud</button>
         <div class="row-2">
@@ -887,6 +904,7 @@
       customers: [],
       products: [],
       records: [],
+      deletedIds: [],
       selectedCustomer: '',
       selectedProduct: '',
       filterCustomer: 'ALL',
@@ -924,11 +942,13 @@
 
         const cReq = metaStore.get('customers');
         const pReq = metaStore.get('products');
+        const dReq = metaStore.get('deletedIds');
         const rReq = recStore.getAll();
 
         tx.oncomplete = () => {
           state.customers = (cReq.result && cReq.result.list) ? cReq.result.list : [];
           state.products = (pReq.result && pReq.result.list) ? pReq.result.list : [];
+          state.deletedIds = (dReq.result && dReq.result.list) ? dReq.result.list : [];
           state.records = rReq.result || [];
           state.records.sort((a, b) => (b.date.localeCompare(a.date) || b.createdAt - a.createdAt));
 
@@ -954,7 +974,10 @@
       return new Promise((resolve) => {
         const tx = db.transaction('meta', 'readwrite');
         tx.objectStore('meta').put({ key, list });
-        tx.oncomplete = () => { triggerAutoSync(); resolve(); };
+        tx.oncomplete = () => {
+          triggerAutoSync();
+          resolve();
+        };
       });
     }
 
@@ -972,8 +995,10 @@
 
     function deleteRecordDB(id) {
       return new Promise((resolve) => {
-        const tx = db.transaction('records', 'readwrite');
+        const tx = db.transaction(['records', 'meta'], 'readwrite');
         tx.objectStore('records').delete(id);
+        if (!state.deletedIds.includes(id)) state.deletedIds.push(id);
+        tx.objectStore('meta').put({ key: 'deletedIds', list: state.deletedIds });
         tx.oncomplete = () => {
           updateBackupSizeInfo();
           triggerAutoSync();
@@ -995,7 +1020,7 @@
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2300);
+      setTimeout(() => t.classList.remove('show'), 2600);
     }
 
     function switchTab(tab) {
@@ -1009,7 +1034,6 @@
     }
 
     function renderSelectors() {
-      // 1. Customer Top Frequent Chips + Custom Dropdown
       const cWrap = document.getElementById('customerChips');
       cWrap.innerHTML = '';
       if (state.customers.length === 0) {
@@ -1030,18 +1054,16 @@
       }
 
       document.getElementById('dd-customer-label').textContent = state.selectedCustomer
-        ? `مشتری انتخابی: ${state.selectedCustomer} (مشاهده کل ${state.customers.length} مورد)`
+        ? `مشتری انتخابی: ${state.selectedCustomer} (کل: ${state.customers.length})`
         : `انتخاب از کل لیست مشتریان (${state.customers.length})...`;
 
-      const ddCustItems = document.getElementById('dd-customer-items');
-      ddCustItems.innerHTML = state.customers.map(c => `
+      document.getElementById('dd-customer-items').innerHTML = state.customers.map(c => `
         <div class="custom-dd-item ${state.selectedCustomer === c ? 'selected' : ''}" onclick="selectCustomer('${c}')">
           <span>${c}</span>
           ${state.selectedCustomer === c ? '<span>✓</span>' : ''}
         </div>
       `).join('');
 
-      // 2. Product Top Frequent Chips + Custom Dropdown
       const pWrap = document.getElementById('productChips');
       pWrap.innerHTML = '';
       if (state.products.length === 0) {
@@ -1062,21 +1084,18 @@
       }
 
       document.getElementById('dd-product-label').textContent = state.selectedProduct
-        ? `کالای انتخابی: ${state.selectedProduct} (مشاهده کل ${state.products.length} مورد)`
+        ? `کالای انتخابی: ${state.selectedProduct} (کل: ${state.products.length})`
         : `انتخاب از کل لیست کالاها (${state.products.length})...`;
 
-      const ddProdItems = document.getElementById('dd-product-items');
-      ddProdItems.innerHTML = state.products.map(p => `
+      document.getElementById('dd-product-items').innerHTML = state.products.map(p => `
         <div class="custom-dd-item ${state.selectedProduct === p ? 'selected' : ''}" onclick="selectProduct('${p}')">
           <span>${p}</span>
           ${state.selectedProduct === p ? '<span>✓</span>' : ''}
         </div>
       `).join('');
 
-      // 3. Filter Custom Dropdowns
       renderFilterDropdowns();
 
-      // 4. Manage Lists in Tab 2
       document.getElementById('customersManageList').innerHTML = state.customers.map(c => `
         <div class="manage-pill">
           <span>${c}</span>
@@ -1093,36 +1112,28 @@
     }
 
     function renderFilterDropdowns() {
-      // Customer Filter DD
       document.getElementById('filterCustomerText').textContent = state.filterCustomer === 'ALL' ? 'همه مشتریان' : state.filterCustomer;
-      const fCustMenu = document.getElementById('filterCustomerMenu');
-      fCustMenu.innerHTML = [
+      document.getElementById('filterCustomerMenu').innerHTML = [
         `<div class="custom-dd-item ${state.filterCustomer === 'ALL' ? 'selected' : ''}" onclick="setFilter('filterCustomer', 'ALL')"><span>همه مشتریان</span></div>`,
         ...state.customers.map(c => `<div class="custom-dd-item ${state.filterCustomer === c ? 'selected' : ''}" onclick="setFilter('filterCustomer', '${c}')"><span>${c}</span></div>`)
       ].join('');
 
-      // Product Filter DD
       document.getElementById('filterProductText').textContent = state.filterProduct === 'ALL' ? 'همه کالاها' : state.filterProduct;
-      const fProdMenu = document.getElementById('filterProductMenu');
-      fProdMenu.innerHTML = [
+      document.getElementById('filterProductMenu').innerHTML = [
         `<div class="custom-dd-item ${state.filterProduct === 'ALL' ? 'selected' : ''}" onclick="setFilter('filterProduct', 'ALL')"><span>همه کالاها</span></div>`,
         ...state.products.map(p => `<div class="custom-dd-item ${state.filterProduct === p ? 'selected' : ''}" onclick="setFilter('filterProduct', '${p}')"><span>${p}</span></div>`)
       ].join('');
 
-      // Month Archive Filter DD
       const uniqueMonths = [...new Set(state.records.map(r => (r.date || '').slice(0, 7)).filter(m => m.length === 7))].sort().reverse();
       document.getElementById('filterMonthText').textContent = state.filterMonth === 'ALL' ? 'همه زمان‌ها' : formatMonthLabel(state.filterMonth);
-      const fMonthMenu = document.getElementById('filterMonthMenu');
-      fMonthMenu.innerHTML = [
+      document.getElementById('filterMonthMenu').innerHTML = [
         `<div class="custom-dd-item ${state.filterMonth === 'ALL' ? 'selected' : ''}" onclick="setFilter('filterMonth', 'ALL')"><span>همه زمان‌ها</span></div>`,
         ...uniqueMonths.map(m => `<div class="custom-dd-item ${state.filterMonth === m ? 'selected' : ''}" onclick="setFilter('filterMonth', '${m}')"><span>${formatMonthLabel(m)}</span><span style="font-size:0.8em;color:var(--muted);">${m}</span></div>`)
       ].join('');
 
-      // Status Filter DD
       const curStatObj = STATUS_OPTIONS.find(s => s.value === state.filterStatus) || STATUS_OPTIONS[0];
       document.getElementById('filterStatusText').textContent = curStatObj.label;
-      const fStatMenu = document.getElementById('filterStatusMenu');
-      fStatMenu.innerHTML = STATUS_OPTIONS.map(s => `
+      document.getElementById('filterStatusMenu').innerHTML = STATUS_OPTIONS.map(s => `
         <div class="custom-dd-item ${state.filterStatus === s.value ? 'selected' : ''}" onclick="setFilter('filterStatus', '${s.value}')">
           <span>${s.label}</span>
         </div>
@@ -1198,6 +1209,21 @@
       inp.value = cur + val;
     }
 
+    function saveDeviceRole() {
+      const role = {
+        author: document.getElementById('deviceAuthor').value.trim(),
+        lockTicks: document.getElementById('operatorLock').checked
+      };
+      localStorage.setItem('workshop_role', JSON.stringify(role));
+      renderRecords();
+    }
+
+    function getDeviceRole() {
+      try {
+        return JSON.parse(localStorage.getItem('workshop_role') || '{}');
+      } catch (e) { return {}; }
+    }
+
     async function saveRecord() {
       if (!state.selectedCustomer) return showToast('لطفاً ابتدا یک مشتری انتخاب کنید');
       if (!state.selectedProduct) return showToast('لطفاً ابتدا یک کالا انتخاب کنید');
@@ -1207,17 +1233,21 @@
 
       const date = document.getElementById('dateInput').value.trim() || getTodayJalali();
       const note = document.getElementById('noteInput').value.trim();
+      const nowTs = Date.now();
+      const role = getDeviceRole();
 
       const rec = {
-        id: 'rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        id: 'rec_' + nowTs + '_' + Math.random().toString(36).slice(2, 6),
         customer: state.selectedCustomer,
         product: state.selectedProduct,
         qty: qty,
         date: date,
         note: note,
+        author: role.author || '',
         warehouseTick: false,
         invoiceTick: false,
-        createdAt: Date.now()
+        createdAt: nowTs,
+        updatedAt: nowTs
       };
 
       state.records.unshift(rec);
@@ -1231,9 +1261,14 @@
     }
 
     async function toggleTick(id, field) {
+      const role = getDeviceRole();
+      if (role.lockTicks) {
+        return showToast('🔒 زدن تیک در حالت اپراتور کارگاه قفل است');
+      }
       const rec = state.records.find(r => r.id === id);
       if (!rec) return;
       rec[field] = !rec[field];
+      rec.updatedAt = Date.now();
       await putRecordDB(rec);
       renderRecords();
     }
@@ -1269,7 +1304,7 @@
         if (fProd !== 'ALL' && r.product !== fProd) return false;
         if (fMonth !== 'ALL' && !(r.date || '').startsWith(fMonth)) return false;
         if (q) {
-          const hay = `${r.date} ${r.note || ''} ${r.customer} ${r.product}`.toLowerCase();
+          const hay = `${r.date} ${r.note || ''} ${r.customer} ${r.product} ${r.author || ''}`.toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
@@ -1318,7 +1353,11 @@
             </div>
 
             <div class="item-meta">
-              <span>📅 تاریخ: <b>${r.date}</b> ${r.note ? ` | 📝 ${r.note}` : ''}</span>
+              <span>
+                📅 <b>${r.date}</b>
+                ${r.author ? ` | <span class="author-badge">✍️ ${r.author}</span>` : ''}
+                ${r.note ? ` | 📝 ${r.note}` : ''}
+              </span>
               <button class="icon-btn" onclick="deleteRecord('${r.id}')" title="حذف">🗑️</button>
             </div>
 
@@ -1338,51 +1377,111 @@
       }).join('');
     }
 
-    /* ========= 5. BACKUP (CORDOVA + NEXTCLOUD WEBDAV) ========= */
+    /* ========= 5. CONFLICT-FREE MERGE & NEXTCLOUD WEBDAV ========= */
+    function buildWebdavUrl(cfg) {
+      let base = (cfg.url || '').trim().replace(/\/+$/, '');
+      if (base && !/^https?:\/\//i.test(base)) base = 'https://' + base;
+      if (base.includes('/index.php')) base = base.split('/index.php')[0];
+      if (base.includes('/apps/')) base = base.split('/apps/')[0];
+      let user = encodeURIComponent((cfg.user || '').trim());
+      let file = (cfg.file || 'workshop-output-backup.json').trim().replace(/^\/+/, '');
+      return base.includes('/remote.php/') ? `${base}/${file}` : `${base}/remote.php/dav/files/${user}/${file}`;
+    }
+
     function getFullBackupObject() {
       return {
         app: 'WorkshopOutputsApp',
-        version: 1,
+        version: 2,
         exportedAt: new Date().toISOString(),
         customers: state.customers,
         products: state.products,
+        deletedIds: state.deletedIds,
         records: state.records
       };
     }
 
-    async function restoreFromObject(data) {
-      if (!data || !Array.isArray(data.records)) {
-        return showToast('❌ فایل بکاپ معتبر نیست');
+    // Conflict-free smart merge: adds new items, preserves manager's ticks & deletions
+    function mergeDataObjects(localObj, incomingObj) {
+      if (!incomingObj || !Array.isArray(incomingObj.records)) {
+        return { merged: localObj, newCount: 0 };
       }
-      state.customers = Array.isArray(data.customers) ? data.customers : [];
-      state.products = Array.isArray(data.products) ? data.products : [];
-      state.records = data.records;
 
-      const tx = db.transaction(['meta', 'records'], 'readwrite');
-      tx.objectStore('meta').put({ key: 'customers', list: state.customers });
-      tx.objectStore('meta').put({ key: 'products', list: state.products });
-      const recStore = tx.objectStore('records');
-      recStore.clear();
-      state.records.forEach(r => recStore.put(r));
+      const mergedDeleted = [...new Set([...(localObj.deletedIds || []), ...(incomingObj.deletedIds || [])])];
+      const deletedSet = new Set(mergedDeleted);
 
-      tx.oncomplete = async () => {
-        await loadAllData();
-        renderSelectors();
-        renderRecords();
-        showToast('✅ اطلاعات با موفقیت بازیابی شد');
+      const mergedCustomers = [...new Set([...(localObj.customers || []), ...(incomingObj.customers || [])])];
+      const mergedProducts = [...new Set([...(localObj.products || []), ...(incomingObj.products || [])])];
+
+      const recMap = new Map();
+      (localObj.records || []).forEach(r => {
+        if (r && r.id && !deletedSet.has(r.id)) recMap.set(r.id, r);
+      });
+
+      let newCount = 0;
+      (incomingObj.records || []).forEach(r => {
+        if (!r || !r.id || deletedSet.has(r.id)) return;
+        const existing = recMap.get(r.id);
+        if (!existing) {
+          recMap.set(r.id, r);
+          newCount++;
+        } else {
+          // Always preserve any tick that has already been checked on manager's phone
+          existing.warehouseTick = Boolean(existing.warehouseTick || r.warehouseTick);
+          existing.invoiceTick = Boolean(existing.invoiceTick || r.invoiceTick);
+          recMap.set(r.id, existing);
+        }
+      });
+
+      const mergedRecords = Array.from(recMap.values());
+      mergedRecords.sort((a, b) => (b.date.localeCompare(a.date) || b.createdAt - a.createdAt));
+
+      return {
+        newCount,
+        merged: {
+          app: 'WorkshopOutputsApp',
+          version: 2,
+          exportedAt: new Date().toISOString(),
+          customers: mergedCustomers,
+          products: mergedProducts,
+          deletedIds: mergedDeleted,
+          records: mergedRecords
+        }
       };
+    }
+
+    async function saveDataToLocalDB(dataObj) {
+      state.customers = Array.isArray(dataObj.customers) ? dataObj.customers : [];
+      state.products = Array.isArray(dataObj.products) ? dataObj.products : [];
+      state.deletedIds = Array.isArray(dataObj.deletedIds) ? dataObj.deletedIds : [];
+      state.records = Array.isArray(dataObj.records) ? dataObj.records : [];
+
+      return new Promise((resolve) => {
+        const tx = db.transaction(['meta', 'records'], 'readwrite');
+        tx.objectStore('meta').put({ key: 'customers', list: state.customers });
+        tx.objectStore('meta').put({ key: 'products', list: state.products });
+        tx.objectStore('meta').put({ key: 'deletedIds', list: state.deletedIds });
+        const recStore = tx.objectStore('records');
+        recStore.clear();
+        state.records.forEach(r => recStore.put(r));
+
+        tx.oncomplete = async () => {
+          await loadAllData();
+          renderSelectors();
+          renderRecords();
+          resolve();
+        };
+      });
     }
 
     function exportBackupJSON() {
       const jsonStr = JSON.stringify(getFullBackupObject(), null, 2);
-      const fileName = `workshop-backup-${getTodayJalali().replace(/\//g, '-')}.json`;
+      const fileName = `workshop-output-${getTodayJalali().replace(/\//g, '-')}.json`;
 
-      // Cordova Native Share Plugin Support
       if (window.plugins && window.plugins.socialsharing) {
         const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
         const df = `data:application/json;base64,${base64Data}`;
         window.plugins.socialsharing.shareWithOptions({
-          message: 'فایل بکاپ خروجی کارگاه',
+          message: 'فایل خروجی کارگاه',
           subject: fileName,
           files: [df]
         });
@@ -1391,7 +1490,7 @@
 
       if (navigator.share && window.File) {
         const file = new File([jsonStr], fileName, { type: 'application/json' });
-        navigator.share({ title: 'Backup Workshop', files: [file] }).catch(() => downloadFallback(jsonStr, fileName));
+        navigator.share({ title: 'Workshop Output', files: [file] }).catch(() => downloadFallback(jsonStr, fileName));
       } else {
         downloadFallback(jsonStr, fileName);
       }
@@ -1403,26 +1502,34 @@
       a.href = URL.createObjectURL(blob);
       a.download = fileName;
       a.click();
-      showToast('فایل بکاپ آماده شد');
+      showToast('فایل آماده شد');
     }
 
     function importBackupJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
+      reader.onload = async (ev) => {
         try {
           const parsed = JSON.parse(ev.target.result);
-          restoreFromObject(parsed);
+          const { merged, newCount } = mergeDataObjects(getFullBackupObject(), parsed);
+          await saveDataToLocalDB(merged);
+          triggerAutoSync();
+          showToast(`✅ ${newCount.toLocaleString('fa-IR')} خروجی جدید اضافه شد (تیک‌های قبلی حفظ شدند)`);
         } catch (err) {
           showToast('خطا در خواندن فایل JSON');
         }
+        e.target.value = '';
       };
       reader.readAsText(file);
     }
 
     function loadNcConfig() {
       try {
+        const role = getDeviceRole();
+        document.getElementById('deviceAuthor').value = role.author || '';
+        document.getElementById('operatorLock').checked = !!role.lockTicks;
+
         const raw = localStorage.getItem('ncConfig_workshop');
         if (!raw) return;
         const cfg = JSON.parse(raw);
@@ -1452,12 +1559,10 @@
       const cfg = JSON.parse(raw);
       if (!cfg.url || !cfg.user || !cfg.pass) return !silent && showToast('اطلاعات Nextcloud ناقص است');
 
-      const baseUrl = cfg.url.endsWith('/') ? cfg.url : cfg.url + '/';
-      const fullUrl = baseUrl + cfg.file;
+      const fullUrl = buildWebdavUrl(cfg);
       const bodyStr = JSON.stringify(getFullBackupObject());
       const authHeader = 'Basic ' + btoa(cfg.user + ':' + cfg.pass);
 
-      // Use Cordova Advanced HTTP if on Android APK to bypass CORS
       if (window.cordova && window.cordova.plugin && window.cordova.plugin.http) {
         window.cordova.plugin.http.setServerTrustMode('nocheck', () => {}, () => {});
         window.cordova.plugin.http.sendRequest(fullUrl, {
@@ -1493,8 +1598,7 @@
       const raw = localStorage.getItem('ncConfig_workshop');
       if (!raw) return showToast('ابتدا تنظیمات Nextcloud را ذخیره کنید');
       const cfg = JSON.parse(raw);
-      const baseUrl = cfg.url.endsWith('/') ? cfg.url : cfg.url + '/';
-      const fullUrl = baseUrl + cfg.file;
+      const fullUrl = buildWebdavUrl(cfg);
       const authHeader = 'Basic ' + btoa(cfg.user + ':' + cfg.pass);
 
       if (window.cordova && window.cordova.plugin && window.cordova.plugin.http) {
@@ -1505,7 +1609,9 @@
         }, async (res) => {
           try {
             const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
-            await restoreFromObject(data);
+            const { merged } = mergeDataObjects(getFullBackupObject(), data);
+            await saveDataToLocalDB(merged);
+            showToast('✅ اطلاعات از Nextcloud بازیابی و ادغام شد');
           } catch (e) {
             showToast('خطا در خواندن داده دریافتی');
           }
@@ -1522,7 +1628,9 @@
         });
         if (!res.ok) return showToast('خطا در دریافت فایل: ' + res.status);
         const data = await res.json();
-        await restoreFromObject(data);
+        const { merged } = mergeDataObjects(getFullBackupObject(), data);
+        await saveDataToLocalDB(merged);
+        showToast('✅ اطلاعات از Nextcloud بازیابی و ادغام شد');
       } catch (err) {
         showToast('خطا در دریافت اطلاعات از Nextcloud');
       }
